@@ -8,7 +8,7 @@ ev = aux.ev
 
 #******************************************************************************#
 
-# ODE finite difference variables#
+# ODE finite difference#
 class ode:
     """ Sets the initial conditions and functions for the Ode """
     def __init__(self,f,h,x0,T0,TF):
@@ -18,8 +18,10 @@ class ode:
 
     """Changes the ODE Rightside without changing the rest of the ODE"""
     def change_F(self,f):
-        if(len(f) != self.n_eq ):
+        if(len(f) == self.n_eq ):
             self.F = f
+        else:
+            print('Error! Incorrect number of equations for the ode\n')
             return
 
     """Calculates x_(n+1) using the Runge-Kutta method

@@ -4,7 +4,7 @@ import ode
 import auxiliar as aux
 
 '''Library that contains the important elements on Schwarzschild's'''
-'''            Spacetime model in General Relativity '''
+'''Spacetime model in General Relativity '''
 
 #******************************************************************************#
 #Schwarzschild function
@@ -23,6 +23,8 @@ class particle:
         self.cv = [t0,r0,phi0]
         phi = aux.deg_to_rad(phi0)
         self.px, self.py  = r0*np.cos(phi), r0*np.sin(phi)
+        self.rmax = 0
+        self.rmin = 0
         if(pow(L,2)>12*pow(M,2)):
             self.rmax = (pow(L,2) - L*np.sqrt(pow(L,2)-12*pow(M,2)))/(2*M) #argmax(V)
             self.rmin = (pow(L,2) + L*np.sqrt(pow(L,2)-12*pow(M,2)))/(2*M) #argmin local(V)
@@ -40,10 +42,28 @@ class particle:
         self.trail_pos_y = []
         return
 
-    '''Particle equations used on the ode
-       Notice that we give an Y that could be different from self.cv
-       The reason is that we use those functions on the Runge-Kutta
-    G1'''
+#Reset particle variables for slider changes in animation
+    def reset_particle(self,E2,L,t0,r0,phi0,signal_drds):
+        self.E2, self.L,self.signal_drds, = E2, L, signal_drds
+        '''Coordinate vector in spacetime, phi0 is in degrees'''
+        self.cv = [t0,r0,phi0]
+        phi = aux.deg_to_rad(phi0)
+        self.px, self.py  = r0*np.cos(phi), r0*np.sin(phi)
+        self.rmax = 0
+        self.rmin = 0
+        '''If the critical values exists then we calculate them '''
+        if(pow(L,2)>12*pow(M,2)):
+            self.rmax = (pow(L,2) - L*np.sqrt(pow(L,2)-12*pow(M,2)))/(2*M) #argmax(V)
+            self.rmin = (pow(L,2) + L*np.sqrt(pow(L,2)-12*pow(M,2)))/(2*M) #argmin local(V)
+        self.trail.set_data([],[])
+        self.trail_pos_x = []
+        self.trail_pos_y = []
+
+
+    '''Particle equations used on the ode'''
+    ''' Notice that we give an Y that could be different from self.cv'''
+    ''' The reason is that we use those functions on the Runge-Kutta'''
+    #G1
     def dtds(self,Y,t):
         E2 = self.E2
         return np.sqrt(E2)/hsch(Y)
@@ -53,7 +73,7 @@ class particle:
         return sg*( np.sqrt( np.abs( E2 - self.V(Y)) ) )
     def mdrds(self,Y,t):
         E2, sg = self.E2, self.signal_drds
-        return (-1.0)*sg*( np.sqrt( np.abs( E2 - self.V(Y)) ) )
+        return (-1.0)*self.drds(Y,t)
     '''G2'''
     def dphids(self,Y,t):
         L, = self.L,

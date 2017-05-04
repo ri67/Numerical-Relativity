@@ -25,3 +25,11 @@ def deg_to_rad(a):
     while(theta <= -2*np.pi):
         theta = theta + 2*np.pi
     return theta
+
+def inlist(a,v):
+    inside = False
+    for i in range(0,len(v)):
+        if(a == v[i]):
+            inside = True
+            break
+    return inside
